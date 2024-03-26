@@ -5,7 +5,7 @@ from app.config import EnvironmentVariables
 
 app = FastAPI()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 @app.middleware("http")
 async def jwt_auth_middleware(request: Request, call_next):

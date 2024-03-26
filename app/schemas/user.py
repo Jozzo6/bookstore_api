@@ -19,7 +19,7 @@ class UserCreate(UserBase):
     password: str
 
 class User(UserBase):
-    id: UUID
+    id: str
     created: Optional[datetime]
     updated: Optional[datetime]
 
