@@ -8,7 +8,7 @@ from sqlalchemy.orm import joinedload
 
 def create_book(db: SessionLocal, book: BookBase) -> BookSchema:
 	try:
-		db_book = Book(title=book.title, author=book.author)
+		db_book = Book(title=book.title, author=book.author, quantity=book.quantity, publisher=book.publisher, isbn=book.isbn, year=book.year)
 		db.add(db_book)
 		db.commit()
 		db.refresh(db_book)
