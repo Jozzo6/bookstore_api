@@ -1,8 +1,10 @@
 from typing import List
 from app.database import SessionLocal
 from app.schemas.book import BookBase, Book as BookSchema
+from app.schemas.borrowed_book import BorrowBook, BorrowBookStatus
 from app.models.book import Book
-
+from app.models.users_books import BooksUsers
+from sqlalchemy.orm import joinedload
 
 def create_book(db: SessionLocal, book: BookBase) -> BookSchema:
 	try:
@@ -53,3 +55,51 @@ def delete_book(db: SessionLocal, book_id: str):
 	except Exception as e:
 		db.rollback()
 		raise ValueError("An error occurred while deleting book: " + str(e))
+	
+def borrow_book(db: SessionLocal, user_id: str, books_id: str) -> BorrowBook:
+	try:
+		book = db.query(Book).filter(Book.id == books_id).first()
+		if book.quantity <= 0:
+			raise ValueError("No available copy of the book")
+		book_user = db.query(BooksUsers).filter(BooksUsers.user_id == user_id, BooksUsers.book_id == books_id).first()
+		if book_user:
+			raise ValueError("User has already borrowed the book")
+
+		books = db.query(BooksUsers).filter(BooksUsers.book_id == books_id, BooksUsers.status == BorrowBookStatus.borrowed.value).all()
+		if len(books) >= book.quantity:
+			raise ValueError("No available copy of the book")
+		
+		book_user = BooksUsers(user_id=user_id, book_id=books_id, status=BorrowBookStatus.borrowed.value)
+		return BorrowBook(**book_user.__dict__)
+	except Exception as e:
+		db.rollback()
+		raise ValueError("An error occurred while deleting book: " + str(e))
+
+def return_book(db: SessionLocal, borrow_id: str) -> BorrowBook:
+	try:
+		book_user = db.query(BooksUsers).filter(BooksUsers.id == borrow_id).first()
+		if not book_user:
+			raise ValueError("User has not borrowed the book")
+		book_user.status = BorrowBookStatus.returned.value
+		db.commit()
+		return BorrowBook(**book_user.__dict__)
+	except Exception as e:
+		db.rollback()
+		raise ValueError("An error occurred while deleting book: " + str(e))
+
+def get_borrowed_books(db: SessionLocal, user_id: str = None, isbn: str = None, book_id: str = None) -> List[BorrowBook]:
+    try:
+        query = db.query(BooksUsers).options(joinedload(BooksUsers.book), joinedload(BooksUsers.user))
+
+        if user_id:
+            query = query.filter(BooksUsers.user_id == user_id)
+        if isbn:
+            query = query.filter(BooksUsers.book.has(Book.isbn == isbn))
+        if book_id:
+            query = query.filter(BooksUsers.book_id == book_id)
+
+        books = query.all()
+
+        return [BorrowBook(**book.__dict__) for book in books]
+    except Exception as e:
+        raise ValueError("An error occurred while fetching books: " + str(e))

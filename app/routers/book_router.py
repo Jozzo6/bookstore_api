@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from app.database import SessionLocal, get_db
 from app.schemas.book import BookBase, Book
-from app.crud.book import create_book, get_all_books, get_book_by_id, update_book, delete_book
+from app.crud.book import create_book, get_all_books, get_book_by_id, update_book, delete_book, get_borrowed_books, borrow_book, return_book
 
 router = APIRouter()
 
@@ -42,5 +42,28 @@ def delete_book_handler(book_id: str, db: SessionLocal = Depends(get_db)):
 	try:
 		delete_book(db, book_id)
 		return "ok"
+	except Exception as e:
+		return {"error": str(e)}
+
+
+@router.get("/books/borrowed")
+def get_borrowed_books_handler(user_id: str = None, isbn: str = None, book_id: str = None, db: SessionLocal = Depends(get_db)):
+	try:
+		books = get_borrowed_books(db, user_id, isbn, book_id)
+		return books
+	except Exception as e:
+		return {"error": str(e)}
+	
+@router.post("/books/borrow/{book_id}/{user_id}")
+def borrow_book_handler(book_id: str, user_id: str, db: SessionLocal = Depends(get_db)):
+	try:
+		return borrow_book(db, user_id, book_id)
+	except Exception as e:
+		return {"error": str(e)}
+
+@router.put("/books/return/{borrow_id}")
+def return_book_handler(borrow_id: str, db: SessionLocal = Depends(get_db)):
+	try:
+		return return_book(db, borrow_id)
 	except Exception as e:
 		return {"error": str(e)}

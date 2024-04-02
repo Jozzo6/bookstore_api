@@ -12,7 +12,11 @@ async def jwt_auth_middleware(request: Request, call_next):
     if any(request.url.path.startswith(path) for path in ["/auth", "/health", "/docs", "/redoc", "/openapi.json"]):
         response = await call_next(request)
         return response
-    token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+    authHeader = request.headers.get('Authorization')
+    print(authHeader);
+    if not authHeader or 'Bearer ' not in authHeader:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    token = authHeader.split("Bearer ")[1]
     if not token:
         raise HTTPException(status_code=401, detail="Unauthorized")
 

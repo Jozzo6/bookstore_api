@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine, Base
 from .routers import user_router, book_router, auth_router
@@ -9,6 +10,14 @@ from .middleware.auth import jwt_auth_middleware
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 app.middleware("http")(jwt_auth_middleware)
 
