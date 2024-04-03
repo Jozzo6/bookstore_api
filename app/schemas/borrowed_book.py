@@ -1,4 +1,6 @@
 from enum import Enum
+from app.schemas.book import Book
+from app.schemas.user import User
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
@@ -9,12 +11,14 @@ class BorrowBookStatus(Enum):
 	returned = "returned"
 
 class BorrowBookBase(BaseModel):
-	book_id: int
-	user_id: int
+	book_id: str
+	user_id: str
 	status: str
 
 class BorrowBook(BorrowBookBase):
-	id: int
+	id: str
+	user: Optional[User]
+	book: Optional[Book]
 	created: Optional[datetime]
 	updated: Optional[datetime]
 

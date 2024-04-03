@@ -24,9 +24,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
         )
-    access_token_expires = timedelta(hours=int(EnvironmentVariables().ACCESS_TOKEN_EXPIRE_HOURS))
+    
     access_token = create_access_token(
-        data={"sub": user.email, "user_id": str(user.id), "user_type": user.type}, expires_delta=access_token_expires
+        data={"sub": user.email, "user_id": str(user.id), "user_type": user.type}
     )
     return AuthResponse(access_token=access_token, user=user)
 

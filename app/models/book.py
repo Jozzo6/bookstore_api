@@ -1,6 +1,7 @@
 import uuid
 from app.database import Base
 from sqlalchemy import Column, Integer, DateTime, func, Text
+from sqlalchemy.orm import relationship
 
 class Book(Base):
     __tablename__ = 'books'
@@ -14,3 +15,5 @@ class Book(Base):
     publisher = Column(Text, nullable=False)
     isbn = Column(Text, nullable=False)
     quantity = Column(Integer, nullable=False)
+
+    users_books = relationship('BooksUsers', back_populates='book')

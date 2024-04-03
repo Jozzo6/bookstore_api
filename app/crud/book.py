@@ -1,4 +1,5 @@
 from typing import List
+import uuid
 from app.database import SessionLocal
 from app.schemas.book import BookBase, Book as BookSchema
 from app.schemas.borrowed_book import BorrowBook, BorrowBookStatus
@@ -61,7 +62,7 @@ def borrow_book(db: SessionLocal, user_id: str, books_id: str) -> BorrowBook:
 		book = db.query(Book).filter(Book.id == books_id).first()
 		if book.quantity <= 0:
 			raise ValueError("No available copy of the book")
-		book_user = db.query(BooksUsers).filter(BooksUsers.user_id == user_id, BooksUsers.book_id == books_id).first()
+		book_user = db.query(BooksUsers).filter(BooksUsers.user_id == user_id, BooksUsers.book_id == books_id, BooksUsers.status == BorrowBookStatus.borrowed.value).first()
 		if book_user:
 			raise ValueError("User has already borrowed the book")
 
@@ -69,11 +70,14 @@ def borrow_book(db: SessionLocal, user_id: str, books_id: str) -> BorrowBook:
 		if len(books) >= book.quantity:
 			raise ValueError("No available copy of the book")
 		
-		book_user = BooksUsers(user_id=user_id, book_id=books_id, status=BorrowBookStatus.borrowed.value)
+		book_user = BooksUsers(id=str(uuid.uuid4()), user_id=user_id, book_id=books_id, status=BorrowBookStatus.borrowed.value)
+		db.add(book_user)
+		db.commit()
+		db.refresh(book_user)
 		return BorrowBook(**book_user.__dict__)
 	except Exception as e:
 		db.rollback()
-		raise ValueError("An error occurred while deleting book: " + str(e))
+		raise ValueError("An error occurred while borrowing book: " + str(e))
 
 def return_book(db: SessionLocal, borrow_id: str) -> BorrowBook:
 	try:
@@ -82,6 +86,7 @@ def return_book(db: SessionLocal, borrow_id: str) -> BorrowBook:
 			raise ValueError("User has not borrowed the book")
 		book_user.status = BorrowBookStatus.returned.value
 		db.commit()
+		db.refresh(book_user)
 		return BorrowBook(**book_user.__dict__)
 	except Exception as e:
 		db.rollback()
@@ -100,6 +105,17 @@ def get_borrowed_books(db: SessionLocal, user_id: str = None, isbn: str = None, 
 
         books = query.all()
 
-        return [BorrowBook(**book.__dict__) for book in books]
+        return [BorrowBook(**book.__dict__) for book in books if book is not None]
     except Exception as e:
         raise ValueError("An error occurred while fetching books: " + str(e))
+	
+def delete_borrow(db: SessionLocal, borrow_id: str):
+	try:
+		book_user = db.query(BooksUsers).filter(BooksUsers.id == borrow_id).first()
+		if not book_user:
+			raise ValueError("User has not borrowed the book")
+		db.delete(book_user)
+		db.commit()
+	except Exception as e:
+		db.rollback()
+		raise ValueError("An error occurred while deleting book: " + str(e))

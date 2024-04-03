@@ -14,7 +14,7 @@ CREATE TABLE users (
 	email TEXT NOT NULL UNIQUE,
 	first_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
-	type TEXT NOT NULL,
+	type INT NOT NULL,
 	password_hash TEXT NOT NULL
 );
 
@@ -39,7 +39,7 @@ CREATE TRIGGER books_modtime BEFORE UPDATE
 	FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
 
 CREATE TABLE users_books (
-	id SERIAL PRIMARY KEY,
+	id TEXT PRIMARY KEY,
 	created timestamp NOT NULL DEFAULT NOW(),
 	updated timestamp NOT NULL DEFAULT NOW(),
 	user_id TEXT NOT NULL REFERENCES users(id),

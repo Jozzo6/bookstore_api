@@ -5,10 +5,9 @@ from uuid import UUID
 from enum import Enum
 
 class UserType(Enum):
-    admin = "admin"
-    librarian = "librarian"
-    customer = "customer"
-
+    admin = 3
+    librarian = 2
+    user = 1
 class UserBase(BaseModel):
     email: str
     first_name: str

@@ -9,6 +9,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 @app.middleware("http")
 async def jwt_auth_middleware(request: Request, call_next):
+    if request.method == "OPTIONS":
+        # Skip authentication for OPTIONS requests
+        return await call_next(request)
+
     if any(request.url.path.startswith(path) for path in ["/auth", "/health", "/docs", "/redoc", "/openapi.json"]):
         response = await call_next(request)
         return response
@@ -22,11 +26,10 @@ async def jwt_auth_middleware(request: Request, call_next):
 
     try:
         payload = jwt.decode(token, EnvironmentVariables().SECRET_KEY, algorithms=[EnvironmentVariables().ALGORITHM])
-        print(payload)
+        request.state.user_type = payload.get("user_type")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    request.state.user = payload.get("user")
-
     response = await call_next(request)
     return response
+

@@ -1,11 +1,11 @@
 INSERT INTO users (id, created, updated, email, first_name, last_name, type, password_hash)
 VALUES 
-  ('550e8400-e29b-41d4-a716-446655440000', NOW(), NOW(), 'john@example.com', 'John', 'Doe', 'admin', '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
-  ('6ba7b810-9dad-11d1-80b4-00c04fd430c8', NOW(), NOW(), 'jane@example.com', 'Jane', 'Smith', 'librarian', '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
-  ('550e8400-e29b-41d4-a716-446655440001', NOW(), NOW(), 'robert@example.com', 'Robert', 'Johnson', 'user', '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
-  ('550e8400-e29b-41d4-a716-446655440002', NOW(), NOW(), 'alice@example.com', 'Alice', 'Brown', 'user', '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
-  ('550e8400-e29b-41d4-a716-446655440003', NOW(), NOW(), 'charlie@example.com', 'Charlie', 'Taylor', 'user', '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
-  ('550e8400-e29b-41d4-a716-446655440004', NOW(), NOW(), 'emily@example.com', 'Emily', 'Anderson', 'user', '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi');
+  ('550e8400-e29b-41d4-a716-446655440000', NOW(), NOW(), 'john@example.com', 'John', 'Doe', 3, '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
+  ('6ba7b810-9dad-11d1-80b4-00c04fd430c8', NOW(), NOW(), 'jane@example.com', 'Jane', 'Smith', 2, '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
+  ('550e8400-e29b-41d4-a716-446655440001', NOW(), NOW(), 'robert@example.com', 'Robert', 'Johnson', 1, '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
+  ('550e8400-e29b-41d4-a716-446655440002', NOW(), NOW(), 'alice@example.com', 'Alice', 'Brown', 1, '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
+  ('550e8400-e29b-41d4-a716-446655440003', NOW(), NOW(), 'charlie@example.com', 'Charlie', 'Taylor', 1, '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi'),
+  ('550e8400-e29b-41d4-a716-446655440004', NOW(), NOW(), 'emily@example.com', 'Emily', 'Anderson', 1, '$2b$12$t6lklpVWbH2G4q8v.wa50OT7ddh4m5oREa3MyWEAyW6xLwmSuV9mi');
 
 INSERT INTO books (id, isbn, created, updated, title, author, year, publisher, quantity)
 VALUES 
@@ -26,3 +26,15 @@ VALUES
   ('550e8400-e29b-41d4-a716-446655440019', '978-1-84356-025-9', NOW(), NOW(), 'The Lost City', 'Robert Johnson', 2015, 'Evergreen Publishers', 1),
   ('6ba7b810-9dad-11d1-80b4-00c04fd432cf', '978-1-86197-876-2', NOW(), NOW(), 'The Forbidden Castle', 'Alice Brown', 2016, 'Blue Sky Books', 1),
   ('550e8400-e29b-41d4-a716-446655440020', '978-0-7475-3267-2', NOW(), NOW(), 'The Golden Key', 'Charlie Taylor', 2017, 'Sunflower Press', 1);
+
+INSERT INTO users_books (id, created, updated, user_id, book_id, status)
+VALUES 
+  ('550e8400-e29b-41d4-aa16-446655440012', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440012', 'borrowed'),
+  ('6ba7b810-9dad-11d1-8ab4-00c04fd432c8', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440000', '6ba7b810-9dad-11d1-80b4-00c04fd432c8', 'returned'),
+  ('550e8400-e29b-41d4-aa16-446655440013', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440013', 'borrowed'),
+  ('6ba7b810-9dad-11d1-8ab4-00c04fd432c9', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440001', '6ba7b810-9dad-11d1-80b4-00c04fd432c9', 'borrowed'),
+  ('550e8400-e29b-41d4-aa16-446655440014', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440014', 'returned'),
+  ('6ba7b810-9dad-11d1-8ab4-00c04fd432ca', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440002', '6ba7b810-9dad-11d1-80b4-00c04fd432ca', 'borrowed'),
+  ('550e8400-e29b-41d4-aa16-446655440015', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440015', 'returned'),
+  ('6ba7b810-9dad-11d1-8ab4-00c04fd432cb', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440003', '6ba7b810-9dad-11d1-80b4-00c04fd432cb', 'borrowed'),
+  ('550e8400-e29b-41d4-aa16-446655440016', NOW(), NOW(), '550e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440016', 'borrowed');
