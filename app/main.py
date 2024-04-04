@@ -3,9 +3,9 @@ from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import engine, Base
-from .routers import user_router, book_router, auth_router
-from .middleware.auth import jwt_auth_middleware
+from app.database import engine, Base
+from app.routers import user_router, book_router, auth_router
+from app.middleware.auth import jwt_auth_middleware
 
 Base.metadata.create_all(bind=engine)
 
