@@ -79,7 +79,15 @@ def borrow_book(db: SessionLocal, user_id: str, books_id: str) -> BorrowBook:
 		db.add(book_user)
 		db.commit()
 		db.refresh(book_user)
-		return BorrowBook(**book_user.__dict__)
+
+		book_user_dict = {**book_user.__dict__, 'id': str(book_user.id), 'book_id': str(book_user.book_id), 'user_id': str(book_user.user_id)}
+		book_user_dict.pop('_sa_instance_state', None)
+		book_user_dict['user'] = book_user.user.__dict__
+		book_user_dict['book'] = book_user.book.__dict__
+		book_user_dict['user'].pop('_sa_instance_state', None)
+		book_user_dict['book'].pop('_sa_instance_state', None)
+
+		return BorrowBook(**book_user_dict)
 	except Exception as e:
 		db.rollback()
 		raise ValueError("An error occurred while borrowing book: " + str(e))
@@ -93,6 +101,11 @@ def return_book(db: SessionLocal, borrow_id: str) -> BorrowBook:
 		db.commit()
 		db.refresh(book_user)
 		book_user_dict = {**book_user.__dict__, 'id': str(book_user.id), 'book_id': str(book_user.book_id), 'user_id': str(book_user.user_id)}
+		book_user_dict.pop('_sa_instance_state', None)
+		book_user_dict['user'] = book_user.user.__dict__
+		book_user_dict['book'] = book_user.book.__dict__
+		book_user_dict['user'].pop('_sa_instance_state', None)
+		book_user_dict['book'].pop('_sa_instance_state', None)
 		return BorrowBook(**book_user_dict)
 	except Exception as e:
 		db.rollback()
@@ -111,7 +124,18 @@ def get_borrowed_books(db: SessionLocal, user_id: str = None, isbn: str = None, 
 
         books = query.all()
 
-        return [BorrowBook(**book.__dict__) for book in books if book is not None]
+        borrowed_books = []
+        for book in books:
+            if book is not None:
+                book_dict = book.__dict__
+                book_dict['user'] = book.user.__dict__
+                book_dict['book'] = book.book.__dict__
+                book_dict.pop('_sa_instance_state', None)
+                book_dict['user'].pop('_sa_instance_state', None)
+                book_dict['book'].pop('_sa_instance_state', None)
+                borrowed_books.append(BorrowBook(**book_dict))
+
+        return borrowed_books
     except Exception as e:
         raise ValueError("An error occurred while fetching books: " + str(e))
 	

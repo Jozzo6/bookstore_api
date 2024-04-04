@@ -24,7 +24,7 @@ def get_user_by_id_handler(request: Request, user_id: str, db: SessionLocal = De
 @router.put("/users/{user_id}", dependencies=[Depends(oauth2_scheme)])
 async def update_user_handler(request: Request ,user_id: str, user: User, db: SessionLocal = Depends(get_db)):
 	check_user_role(request, min_role=3)	
-	return await update_user(db, user_id, user)
+	return update_user(db, user_id, user)
 
 @router.delete("/users/{user_id}", dependencies=[Depends(oauth2_scheme)])
 def delete_user_handler(request: Request, user_id: str, db: SessionLocal = Depends(get_db)):
