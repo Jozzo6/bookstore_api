@@ -14,6 +14,10 @@ def create_book(db: SessionLocal, book: BookBase) -> BookSchema:
 		db.commit()
 		db.refresh(db_book)
 		return BookSchema(**db_book.__dict__)
+	except ValidationError as e:
+		print(e.errors())
+		db.rollback()
+		raise ValueError("An error occurred while creating book: " + str(e))
 	except Exception as e:
 		db.rollback()
 		raise ValueError("An error occurred while creating book: " + str(e))
@@ -43,7 +47,8 @@ def update_book(db: SessionLocal, book_id: str, book: BookSchema) -> BookSchema:
 		db_book.year = book.year
 		db.commit()
 		db.refresh(db_book)
-		return BookSchema(**db_book.__dict__)
+		book_dict = {**db_book.__dict__, 'id': str(db_book.id)}
+		return BookSchema(**book_dict)
 	except Exception as e:
 		db.rollback()
 		raise ValueError("An error occurred while updating book: " + str(e))
@@ -87,7 +92,8 @@ def return_book(db: SessionLocal, borrow_id: str) -> BorrowBook:
 		book_user.status = BorrowBookStatus.returned.value
 		db.commit()
 		db.refresh(book_user)
-		return BorrowBook(**book_user.__dict__)
+		book_user_dict = {**book_user.__dict__, 'id': str(book_user.id), 'book_id': str(book_user.book_id), 'user_id': str(book_user.user_id)}
+		return BorrowBook(**book_user_dict)
 	except Exception as e:
 		db.rollback()
 		raise ValueError("An error occurred while deleting book: " + str(e))

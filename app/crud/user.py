@@ -26,7 +26,7 @@ def get_all_users(db: Session):
 def get_user_by_email(db: Session, email: str) -> User:
 	return db.query(User).filter(User.email == email).first()
 
-async def update_user(db: Session, user_id: str, user: UserSchema) -> UserSchema:
+def update_user(db: Session, user_id: str, user: UserSchema) -> UserSchema:
     try:
         db_user = db.query(User).filter(User.id == user_id).first()
         db_user.email = user.email
@@ -35,7 +35,8 @@ async def update_user(db: Session, user_id: str, user: UserSchema) -> UserSchema
         db_user.type = user.type.value
         db.commit()
         db.refresh(db_user)
-        return UserSchema(**db_user.__dict__)
+        user_dict = {**db_user.__dict__, 'id': str(db_user.id)}
+        return UserSchema(**user_dict)
     except Exception as e:
         db.rollback()
         raise ValueError("An error occurred while updating user: " + str(e))
